@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>Board Question Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+@page{
+    size:A4;
+    margin:20mm;
+}
+
+body{
+    font-family:"Noto Serif Bengali","Kalpurush","SolaimanLipi",serif;
+    background:#f4f6f9;
+    padding:30px;
+    -webkit-font-smoothing:antialiased;
+}
+
+.container{
+    max-width:820px;   /* A4 printable width */
+    margin:auto;
+    background:white;
+    padding:40px;
+    box-shadow:0 0 20px rgba(0,0,0,0.08);
+}
+
+.school{
+    text-align:center;
+    font-size:22px;
+    color:#4fc3f7;
+    font-weight:700;
+}
+
+.exam{
+    text-align:center;
+    font-size:17px;
+    color:#4fc3f7;
+    font-weight:600;
+    margin-top:6px;
+}
+
+.classsub,.fm{
+    text-align:center;
+    margin-top:6px;
+    color:#4fc3f7;
+    font-weight:600;
+    font-size:15px;
+}
+
+.boldline{
+    border-top:4px solid black;
+    margin:18px 0;
+}
+
+.section{
+    margin-top:28px;
+}
+
+.section-title{
+    color:#4fc3f7;
+    font-weight:700;
+    margin-bottom:14px;
+    font-size:16px;
+}
+
+.qline{
+    margin-bottom:10px;
+    line-height:2;
+    font-size:16px;
+}
+
+.qnum{
+    font-weight:600;
+    margin-right:4px;
+}
+
+input,textarea{
+    width:100%;
+    margin-bottom:12px;
+    padding:10px;
+    font-family:"Noto Serif Bengali",serif;
+    font-size:15px;
+}
+
+textarea{
+    min-height:220px;   /* Bigger Text Area */
+    resize:vertical;
+}
+
+button{
+    padding:10px 22px;
+    background:#1565c0;
+    color:white;
+    border:none;
+    cursor:pointer;
+    font-family:"Noto Serif Bengali",serif;
+    font-size:14px;
+    margin-right:10px;
+}
+
+button:hover{
+    background:#0d47a1;
+}
+
+@media print{
+    input,textarea,button{
+        display:none;
+    }
+    body{
+        background:white;
+        padding:0;
+    }
+    .container{
+        box-shadow:none;
+        padding:0;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<input type="text" id="school" placeholder="School Name">
+<input type="text" id="exam" placeholder="Exam Name">
+<input type="text" id="classsub" placeholder="Class - Subject">
+<input type="text" id="fm" placeholder="Full Marks & Time">
+<input type="number" id="marks" placeholder="30 / 50 / 70">
+<textarea id="raw" placeholder="Paste AI Raw Questions Here"></textarea>
+
+<button onclick="generate()">Generate</button>
+<button onclick="window.print()">Print / Save PDF</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+function generate(){
+
+let school=document.getElementById("school").value;
+let exam=document.getElementById("exam").value;
+let classsub=document.getElementById("classsub").value;
+let fm=document.getElementById("fm").value;
+let marks=parseInt(document.getElementById("marks").value);
+let raw=document.getElementById("raw").value.trim();
+
+if(!raw){
+    alert("প্রশ্ন পেস্ট করুন");
+    return;
+}
+
+let lines=raw.split("\n").filter(l=>l.trim()!="");
+
+let output=`
+<div class="school">${school}</div>
+<div class="exam">${exam}</div>
+<div class="classsub">${classsub}</div>
+<div class="fm">${fm}</div>
+<div class="boldline"></div>
+`;
+
+let index=0;
+
+function printMCQ(sectionNo,count,title,markText){
+    output+=`<div class="section">
+    <div class="section-title">${sectionNo}. ${title}: ${markText}</div>`;
+
+    for(let i=1;i<=count;i++){
+        if(!lines[index]){
+            alert("MCQ সংখ্যা কম আছে");
+            return;
+        }
+
+        output+=`
+        <div class="qline">
+            <span class="qnum">${sectionNo}.${i}</span>
+            ${lines[index]}
+        </div>`;
+
+        index++;
+    }
+
+    output+=`</div>`;
+}
+
+function printSection(sectionNo,count,title,markText){
+    output+=`<div class="section">
+    <div class="section-title">${sectionNo}. ${title}: ${markText}</div>`;
+
+    for(let i=1;i<=count;i++){
+        if(!lines[index]){
+            alert("প্রশ্ন সংখ্যা কম আছে");
+            return;
+        }
+
+        output+=`
+        <div class="qline">
+            <span class="qnum">${sectionNo}.${i}</span>
+            ${lines[index]}
+        </div>`;
+
+        index++;
+    }
+
+    output+=`</div>`;
+}
+
+if(marks==30){
+    printMCQ(1,8,"সঠিক উত্তরটি বেছে নিয়ে লেখো","1×8=8");
+    printSection(2,14,"দু-একটি বাক্যে উত্তর দাও","1×14=14");
+    printSection(3,2,"কয়েকটি বাক্যে উত্তর দাও","2×2=4");
+    printSection(4,2,"কয়েকটি বাক্যে উত্তর দাও","2×2=4");
+}
+
+if(marks==50){
+    printMCQ(1,12,"সঠিক উত্তরটি বেছে নিয়ে লেখো","1×12=12");
+    printSection(2,12,"দু-একটি বাক্যে উত্তর দাও","1×12=12");
+    printSection(3,3,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ২টি)","3×3");
+    printSection(4,3,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ২টি)","3×3");
+    printSection(5,3,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ২টি)","3×3");
+    printSection(6,3,"ব্যাকরণ/পত্র (লিখবে ২টি)","4×3");
+}
+
+if(marks==70){
+    printMCQ(1,15,"সঠিক উত্তরটি বেছে নিয়ে লেখো","1×15=15");
+    printSection(2,14,"দু-একটি বাক্যে উত্তর দাও","1×14=14");
+    printSection(3,3,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ২টি)","2×3");
+    printSection(4,3,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ২টি)","2×3");
+    printSection(5,2,"কয়েকটি বাক্যে উত্তর দাও (লিখবে ১টি)","3×2");
+    printSection(6,3,"১৫০ শব্দে উত্তর দাও (লিখবে ২টি)","5×3");
+    printSection(7,3,"১৫০ শব্দে উত্তর দাও (লিখবে ২টি)","5×3");
+    printSection(8,3,"২৫০ শব্দে রচনা (লিখবে ১টি)","6");
+    printSection(9,2,"পত্র লেখো (লিখবে ১টি)","4");
+}
+
+document.getElementById("output").innerHTML=output;
+
+}
+
+</script>
+
+</body>
+</html>
